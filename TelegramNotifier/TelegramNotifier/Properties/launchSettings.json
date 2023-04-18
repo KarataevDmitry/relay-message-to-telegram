@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "TelegramNotifier": {
+      "commandName": "Project",
+      "commandLineArgs": "\"Hello World\""
+    }
+  }
+}
