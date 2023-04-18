@@ -2,5 +2,5 @@
 internal class TelegramBotSettings
 {
     public string BotKey { get; set; }
-    public string GroupId { get; set; }
+    public long GroupId { get; set; }
 }
