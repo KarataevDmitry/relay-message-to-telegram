@@ -5,4 +5,5 @@ internal class TelegramSettings
     public string API_HASH { get; set; }
     public string AccountPhone { get; set; }
     public string SessionPathName { get; set; }
+    public string LogFileName { get; set; }
 }

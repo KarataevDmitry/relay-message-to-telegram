@@ -2,6 +2,8 @@
 
 using Microsoft.Extensions.Configuration;
 
+using System.Text;
+
 using TL;
 
 using WTelegram;
@@ -13,6 +15,8 @@ if (args.Length == 0)
 IConfiguration configuration = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
 var tgSettingsConfSection = configuration.GetRequiredSection(nameof(TelegramSettings)).Get<TelegramSettings>();
 using var client = new Client(tgSettingsConfSection.API_ID, tgSettingsConfSection.API_HASH, tgSettingsConfSection.SessionPathName);
+StreamWriter WTelegramLogs = new StreamWriter(tgSettingsConfSection.LogFileName, true, Encoding.UTF8) { AutoFlush = true };
+WTelegram.Helpers.Log = (lvl, str) => WTelegramLogs.WriteLine($"{DateTime.Now:yyyy-MM-dd HH:mm:ss} [{"TDIWE!"[lvl]}] {str}");
 await DoLogin(tgSettingsConfSection.AccountPhone);
 if (args.Length == 2)
 {
