@@ -1,0 +1,4 @@
+﻿This app sends a message to user programmatically.
+Telegram Notifier <message> <username> 
+where <message> is a string with message (surrounded with "");
+and <username> is a telegram username
