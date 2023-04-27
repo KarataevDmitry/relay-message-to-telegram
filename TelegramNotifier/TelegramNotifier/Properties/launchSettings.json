@@ -2,7 +2,7 @@
   "profiles": {
     "TelegramNotifier": {
       "commandName": "Project",
-      "commandLineArgs": "\"Hello World\""
+      "commandLineArgs": "\"Glory to the robots! Kill all humans!\" \"answeroom\" "
     }
   }
 }
