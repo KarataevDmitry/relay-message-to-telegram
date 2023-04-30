@@ -7,15 +7,19 @@ using System.Text;
 using TL;
 
 using WTelegram;
+var currDir = Directory.GetCurrentDirectory();
 if (args.Length == 0)
 {
-    Console.WriteLine(File.ReadAllText("APP_USAGE.txt"));
+    var pathToAppUsageFile = Path.Combine(currDir, "APP_USAGE.txt");
+    Console.WriteLine(File.ReadAllText(pathToAppUsageFile));
     return;
 }
-IConfiguration configuration = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
+var pathToConfigurationFile = Path.Combine(currDir, "appsettings.json");
+IConfiguration configuration = new ConfigurationBuilder().AddJsonFile(pathToConfigurationFile).Build();
 var tgSettingsConfSection = configuration.GetRequiredSection(nameof(TelegramSettings)).Get<TelegramSettings>();
 using var client = new Client(tgSettingsConfSection.API_ID, tgSettingsConfSection.API_HASH, tgSettingsConfSection.SessionPathName);
-StreamWriter WTelegramLogs = new StreamWriter(tgSettingsConfSection.LogFileName, true, Encoding.UTF8) { AutoFlush = true };
+var pathToLogFile = Path.Combine(currDir, tgSettingsConfSection.LogFileName);
+StreamWriter WTelegramLogs = new StreamWriter(pathToLogFile, true, Encoding.UTF8) { AutoFlush = true };
 WTelegram.Helpers.Log = (lvl, str) => WTelegramLogs.WriteLine($"{DateTime.Now:yyyy-MM-dd HH:mm:ss} [{"TDIWE!"[lvl]}] {str}");
 await DoLogin(tgSettingsConfSection.AccountPhone);
 if (args.Length == 2)
