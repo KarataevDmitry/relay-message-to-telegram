@@ -350,3 +350,4 @@ MigrationBackup/
 .ionide/
 *.session
 /TelegramNotifier/TelegramNotifier/appsettings.json
+/TelegramNotifier/TelegramNotifier.Tests/appsettings.json
