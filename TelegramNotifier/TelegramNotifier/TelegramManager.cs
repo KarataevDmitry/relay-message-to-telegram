@@ -1,0 +1,72 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+using TL;
+
+using WTelegram;
+
+namespace TelegramNotifier
+{
+    public class TelegramManager
+    {
+        readonly Client _telegramClient;
+   
+        public TelegramManager(Client client)
+        {
+                _telegramClient = client;
+        }
+        public async Task DoLogin(string loginInfo) // (add this method to your code)
+        {
+            while (_telegramClient.User == null)
+            {
+                switch (await _telegramClient.Login(loginInfo)) // returns which config is needed to continue login
+                {
+                    case "verification_code": Console.Write("Code: "); loginInfo = Console.ReadLine(); break;
+                    case "name": loginInfo = "John Doe"; break;    // if sign-up is required (first/last_name)
+                    case "password": loginInfo = Console.ReadLine(); break;// if user has enabled 2FA
+                    default: loginInfo = null; break;
+                }
+            }
+
+            Console.WriteLine($"We are logged-in as {_telegramClient.User} (id {_telegramClient.User.id})");
+        }
+        public async Task CreateChat(string groupName, string invitedUserName)
+        {
+            var result = await _telegramClient.Contacts_ResolveUsername(invitedUserName);
+            var data = await _telegramClient.Messages_CreateChat(new InputUser[] { result.User }, groupName);
+            Console.WriteLine($"Chat created with id={data.Chats.Keys.ElementAt(0)}");
+        }
+        public async Task DeleteChat(long chat_id)
+        {
+            await _telegramClient.DeleteChat(new InputPeerChat(chat_id));
+            Console.WriteLine($"chat with id = {chat_id} is deleted");
+        }
+        public async Task AddUserToChat(long chat_id, string invitedUserName)
+        {
+            var result = await _telegramClient.Contacts_ResolveUsername(invitedUserName);
+            await _telegramClient.AddChatUser(new InputPeerChat(chat_id), result.User);
+        }
+        public async Task DeleteUserFromChat(long chat_id, string deletedUserName)
+        {
+            var result = await _telegramClient.Contacts_ResolveUsername(deletedUserName);
+            await _telegramClient.DeleteChatUser(new InputPeerChat(chat_id), result.User);
+        }
+        public async Task SendMessageToChat(long chat_id, string message)
+        {
+            await _telegramClient.SendMessageAsync(new InputPeerChat(chat_id), message);
+        }
+       public async Task SendMessageToUser(string targetUserName, string message)
+        {
+            var result = await _telegramClient.Contacts_ResolveUsername(targetUserName);
+            await _telegramClient.SendMessageAsync(result.User, message);
+        }
+        public async Task<IEnumerable<Message>> GetMessagesFromChat(long chat_id)
+        {
+            var history = await _telegramClient.Messages_GetHistory(new InputPeerChat(chat_id));
+            return history.Messages.OfType<Message>();
+        }
+    }
+}
