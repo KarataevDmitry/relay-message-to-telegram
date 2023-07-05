@@ -2,7 +2,7 @@
   "profiles": {
     "TelegramNotifier": {
       "commandName": "Project",
-      "commandLineArgs": "delete-chat 65451378"
+      "commandLineArgs": "get-messages 979115881"
     }
   }
 }

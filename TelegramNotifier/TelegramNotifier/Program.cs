@@ -64,9 +64,9 @@ if (operationKind == "get-messages")
 {
     var chat_id = long.Parse(args[1]);
     var history = await client.Messages_GetHistory(new InputPeerChat(chat_id));
-    foreach (var m in history.Messages)
+    foreach (var m in history.Messages.OfType<Message>())
     {
-        Console.WriteLine(m);
+        Console.WriteLine(m.message);
     }
 }
 if (operationKind == "send-message-to-chat")
