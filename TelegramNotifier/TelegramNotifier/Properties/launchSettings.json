@@ -2,7 +2,7 @@
   "profiles": {
     "TelegramNotifier": {
       "commandName": "Project",
-      "commandLineArgs": "\"Glory to the robots! Kill all humans!\" \"answeroom\" "
+      "commandLineArgs": "delete-chat 65451378"
     }
   }
 }
