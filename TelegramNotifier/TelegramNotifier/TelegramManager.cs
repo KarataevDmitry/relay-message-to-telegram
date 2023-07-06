@@ -78,7 +78,16 @@ namespace TelegramNotifier
        public async Task SendMessageToUser(string targetUserName, string message)
         {
             var result = await _telegramClient.Contacts_ResolveUsername(targetUserName);
-            await _telegramClient.SendMessageAsync(result.User, message);
+
+            try
+            {
+                await _telegramClient.SendMessageAsync(result.User, message);
+            }
+            catch (RpcException e)
+            {
+                Console.WriteLine($"I have a trouble  {e.Message} when send message to @{targetUserName}");
+                throw;
+            }
         }
         public async Task<IEnumerable<Message>> GetMessagesFromChat(long chat_id)
         {
