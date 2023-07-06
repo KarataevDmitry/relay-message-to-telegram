@@ -12,6 +12,7 @@ namespace TelegramNotifier
 {
     public class TelegramManager
     {
+        private const string USER_PRIVACY_RESTRICTED_MESSAGE = "USER_PRIVACY_RESTRICTED";
         readonly Client _telegramClient;
    
         public TelegramManager(Client client)
@@ -47,7 +48,19 @@ namespace TelegramNotifier
         public async Task AddUserToChat(long chat_id, string invitedUserName)
         {
             var result = await _telegramClient.Contacts_ResolveUsername(invitedUserName);
-            await _telegramClient.AddChatUser(new InputPeerChat(chat_id), result.User);
+
+            try
+            {
+                await _telegramClient.AddChatUser(new InputPeerChat(chat_id), result.User);
+            }
+            catch (RpcException e)
+            {
+                if (e.Message== USER_PRIVACY_RESTRICTED_MESSAGE)
+                {
+                    Console.WriteLine($"Addition for user @{invitedUserName} to chat {chat_id} is restricted by privacy settings of invited user");
+                }
+                if (e.Message=="")
+            }
         }
         public async Task DeleteUserFromChat(long chat_id, string deletedUserName)
         {
