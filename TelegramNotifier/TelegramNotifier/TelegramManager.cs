@@ -13,6 +13,7 @@ namespace TelegramNotifier
     public class TelegramManager
     {
         private const string USER_PRIVACY_RESTRICTED_MESSAGE = "USER_PRIVACY_RESTRICTED";
+        private const string USER_NOT_MUTUAL_CONTACT = "USER_NOT_MUTUAL_CONTACT";
         readonly Client _telegramClient;
    
         public TelegramManager(Client client)
@@ -59,7 +60,10 @@ namespace TelegramNotifier
                 {
                     Console.WriteLine($"Addition for user @{invitedUserName} to chat {chat_id} is restricted by privacy settings of invited user");
                 }
-                if (e.Message=="")
+                if (e.Message==USER_NOT_MUTUAL_CONTACT)
+                {
+                    Console.WriteLine($"User @{invitedUserName} already left chat {chat_id} and I can't add it");
+                }
             }
         }
         public async Task DeleteUserFromChat(long chat_id, string deletedUserName)
