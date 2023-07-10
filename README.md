@@ -39,5 +39,6 @@ where ```<command>``` is one of:
 if user privacy settings ban invites or messages you'll be noticed on console 
 
 username provided without @ character
+
 first launch of app request user login, next - uses .session file
 if u want to use another user you should remove *.session
