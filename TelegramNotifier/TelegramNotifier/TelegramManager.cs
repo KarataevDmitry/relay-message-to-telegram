@@ -86,7 +86,6 @@ namespace TelegramNotifier
             catch (RpcException e)
             {
                 Console.WriteLine($"I have a trouble  {e.Message} when send message to @{targetUserName}");
-                throw;
             }
         }
         public async Task<IEnumerable<Message>> GetMessagesFromChat(long chat_id)
