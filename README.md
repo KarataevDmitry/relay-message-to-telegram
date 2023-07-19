@@ -2,7 +2,7 @@
 CLI Telegram Message Sender
 # Usage
 
-```./TelegramNotifier.exe <command> <data>```
+```./TelegramNotifier.exe <command> <parameters>```
 
 where ```<command>``` is one of:
 
