@@ -9,6 +9,8 @@ using TelegramNotifier;
 using TL;
 
 using WTelegram;
+using System.Linq;
+
 var currDir = Directory.GetCurrentDirectory();
 if (args.Length == 0)
 {
@@ -59,7 +61,18 @@ if (operationKind == "get-messages")
 {
     var chat_id = long.Parse(args[1]);
    var messages =  await tm.GetMessagesFromChat(chat_id);
-    messages.ToList().ForEach((x) => Console.WriteLine(x));
+  
+}
+if (operationKind == "get-media")
+{
+ var chat_id = long.Parse(args[1]);
+   var messages =  await tm.GetMessagesFromChat(chat_id);
+    foreach (var message in from message in messages
+                            where message.flags.HasFlag(Message.Flags.has_media)
+                            select message)
+    {
+        await tm.DownloadMediaFromMessage(message, ca.ApplicationSettings.SavedMediaLocationPath);
+    }
 }
 if (operationKind == "send-message-to-chat")
 {
