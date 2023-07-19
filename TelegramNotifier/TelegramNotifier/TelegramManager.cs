@@ -98,7 +98,10 @@ namespace TelegramNotifier
             var d = (MessageMediaDocument) message.media;
 
             string directory = Path.Combine(Directory.GetCurrentDirectory(), mediaFolder);
-            Directory.CreateDirectory(directory);
+           if (!Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
 
             using var outStr = new FileStream(Path.Combine(directory, (d.document as Document).Filename), FileMode.OpenOrCreate);
            _ = await _telegramClient.DownloadFileAsync(d.document as Document, outStr);
