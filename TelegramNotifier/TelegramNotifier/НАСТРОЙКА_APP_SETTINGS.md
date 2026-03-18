@@ -1,12 +1,14 @@
-# Подробная инструкция по настройке appsettings.json
+# Подробная инструкция по настройке конфига
 
 ## Обзор
 
 Ваше приложение использует **WTelegramClient** для работы с Telegram API, что означает, что оно работает как обычное приложение Telegram, а не как бот. Это требует получения API ключей от Telegram для разработчиков.
 
-## Структура appsettings.json
+**Конфиг:** предпочтительно **appsettings.toml** — скопируй `appsettings.toml.example` в `appsettings.toml` и заполни секцию `[TelegramSettings]`. Поддерживается и старый формат **appsettings.json**. Оба файла в `.gitignore`.
 
-Ваш файл `appsettings.json` должен содержать следующие настройки:
+## Структура appsettings.json / appsettings.toml
+
+Ваш файл `appsettings.json` или `appsettings.toml` должен содержать следующие настройки:
 
 ```json
 {

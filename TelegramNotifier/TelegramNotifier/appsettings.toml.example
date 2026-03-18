@@ -1,0 +1,12 @@
+# Copy to appsettings.toml and fill in your API_ID, API_HASH, AccountPhone.
+# appsettings.toml is not committed (see .gitignore).
+
+[TelegramSettings]
+API_ID = 0
+API_HASH = ""
+AccountPhone = ""
+SessionPathName = "WTelegram.session"
+LogFileName = "wtelegram.log"
+
+[ApplicationSettings]
+SavedMediaLocationPath = "SavedMedia"

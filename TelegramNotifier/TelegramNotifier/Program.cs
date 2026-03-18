@@ -1,89 +1,64 @@
-﻿// See https://aka.ms/new-console-template for more information
-
 using System.Text;
-
-
-
+using Spectre.Console;
+using Spectre.Console.Cli;
 using TelegramNotifier;
-
-using TL;
-
+using TelegramNotifier.Commands;
 using WTelegram;
-using System.Linq;
 
 var currDir = Directory.GetCurrentDirectory();
+
 if (args.Length == 0)
 {
-    var pathToAppUsageFile = Path.Combine(currDir, "APP_USAGE.txt");
-    Console.WriteLine(File.ReadAllText(pathToAppUsageFile));
-    return;
-}
-ConfigurationAccessor ca = new();
-var tgSettingsConfSection = ca.Settings;
-
-using var client = new Client(tgSettingsConfSection.API_ID, tgSettingsConfSection.API_HASH, tgSettingsConfSection.SessionPathName);
-var pathToLogFile = Path.Combine(currDir, tgSettingsConfSection.LogFileName);
-StreamWriter WTelegramLogs = new(pathToLogFile, true, Encoding.UTF8) { AutoFlush = true };
-WTelegram.Helpers.Log = (lvl, str) => WTelegramLogs.WriteLine($"{DateTime.Now:yyyy-MM-dd HH:mm:ss} [{"TDIWE!"[lvl]}] {str}");
-TelegramManager tm = new(client);
-await tm.DoLogin(tgSettingsConfSection.AccountPhone);
-var operationKind = args[0];
-if (operationKind == "send-message-to-user")
-{
-    var targetUserName = args[1];
-    var message = args[2];
-    await tm.SendMessageToUser(targetUserName, message);
-}
-if (operationKind == "create-chat")
-{
-    var groupName = args[1];
-    var invitedUserName = args[2];
-    await tm.CreateChat(groupName, invitedUserName);
-}
-if (operationKind == "delete-chat")
-{
-    var chat_id = long.Parse(args[1]);
-    await tm.DeleteChat(chat_id);
-}
-if (operationKind == "invite-user")
-{
-    var chat_id = long.Parse(args[1]);
-    var invitedUserName = args[2];
-    await tm.AddUserToChat(chat_id, invitedUserName);
-}
-if (operationKind == "delete-user-from-chat")
-{
-    var chat_id = long.Parse(args[1]);
-    var usernameToDelete = args[2];
-    await tm.DeleteUserFromChat(chat_id, usernameToDelete);
-}
-if (operationKind == "get-messages")
-{
-    var chat_id = long.Parse(args[1]);
-   var messages =  await tm.GetMessagesFromChat(chat_id);
-  
-}
-if (operationKind == "get-media")
-{
- var chat_id = long.Parse(args[1]);
-   var messages =  await tm.GetMessagesFromChat(chat_id);
-    foreach (var message in from message in messages
-                            where message.flags.HasFlag(Message.Flags.has_media)
-                            select message)
+    var usagePath = Path.Combine(currDir, "APP_USAGE.txt");
+    if (File.Exists(usagePath))
     {
-        await tm.DownloadMediaFromMessage(message, ca.ApplicationSettings.SavedMediaLocationPath);
+        var usage = File.ReadAllText(usagePath);
+        Console.WriteLine(usage);
     }
+    else
+    {
+        var app = new CommandApp();
+        ConfigureCommands(app);
+        return await app.RunAsync(["--help"]).ConfigureAwait(false);
+    }
+    return 0;
 }
-if (operationKind == "send-message-to-chat")
+
+var ca = new ConfigurationAccessor();
+var tgSettings = ca.Settings;
+using var client = new Client(tgSettings.API_ID, tgSettings.API_HASH, tgSettings.SessionPathName);
+var logPath = Path.Combine(currDir, tgSettings.LogFileName);
+await using (var logStream = new StreamWriter(logPath, true, Encoding.UTF8) { AutoFlush = true })
 {
-    var chat_id = long.Parse(args[1]);
-    var message = args[2];
-    await tm.SendMessageToChat(chat_id, message);
+    WTelegram.Helpers.Log = (lvl, str) => logStream.WriteLine($"{DateTime.Now:yyyy-MM-dd HH:mm:ss} [{"TDIWE!"[lvl]}] {str}");
+    var tm = new TelegramManager(client);
+    await tm.DoLogin(tgSettings.AccountPhone).ConfigureAwait(false);
+    RunContext.Config = ca;
+    RunContext.TelegramManager = tm;
 
+    var commandApp = new CommandApp();
+    ConfigureCommands(commandApp);
+    var result = await commandApp.RunAsync(args).ConfigureAwait(false);
+    WTelegram.Helpers.Log = (_, _) => { }; // client.Dispose() may log; stream is about to close
+    return result;
 }
 
-
-
-
-
-
+static void ConfigureCommands(ICommandApp app)
+{
+    app.Configure(config =>
+    {
+        config.AddCommand<SendMessageToUserCommand>("send-message-to-user");
+        config.AddCommand<CreateChatCommand>("create-chat");
+        config.AddCommand<DeleteChatCommand>("delete-chat");
+        config.AddCommand<InviteUserCommand>("invite-user");
+        config.AddCommand<DeleteUserFromChatCommand>("delete-user-from-chat");
+        config.AddCommand<ListChatsCommand>("list-chats");
+        config.AddCommand<GetMessagesCommand>("get-messages");
+        config.AddCommand<GetMediaCommand>("get-media");
+        config.AddCommand<CreateTopicCommand>("create-topic");
+        config.AddCommand<SendMessageToChatCommand>("send-message-to-chat");
+        config.AddCommand<EditMessageCommand>("edit-message");
+        config.AddCommand<DeleteMessageCommand>("delete-message");
+        config.AddCommand<UpdateOldMessagesCommand>("update-old-messages");
+    });
+}

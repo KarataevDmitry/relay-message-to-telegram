@@ -1,10 +1,24 @@
-﻿Usage
+Usage
 ./TelegramNotifier.exe <command> <data> 
 where <command> one of:
 	send-message-to-chat 
-		description: send a message to chat with id
-		parameters: chatId, message
-		example of use: .\TelegramNotifier.exe send-message-to-chat 840666093 "This is programmatically sended message"
+		description: send a message to chat with id (optional topic for forum groups)
+		parameters: chatId, message [, topicId]
+		example: .\TelegramNotifier.exe send-message-to-chat 840666093 "Hello"
+		example with topic: .\TelegramNotifier.exe send-message-to-chat -1001234567890 "Hello" 42
+	edit-message
+		description: edit an existing message (only messages sent by this account). message_id from get-messages (Id field).
+		parameters: chatId, messageId, newText
+		example: .\TelegramNotifier.exe edit-message -1001234567890 123 "Updated text"
+	delete-message
+		description: delete a message (only our messages, or with admin rights in channels). message_id from get-messages (Id field).
+		parameters: chatId, messageId
+		example: .\TelegramNotifier.exe delete-message -1001234567890 123
+	update-old-messages
+		description: re-format old messages in a chat: edits each message sent by this account with the same text so it gets MD→HTML formatting (bold, code, etc.). Uses last page of history. Optional topic_id for forum groups.
+		parameters: chatId [, topicId]
+		example: .\TelegramNotifier.exe update-old-messages -1001234567890
+		example with topic: .\TelegramNotifier.exe update-old-messages -1001234567890 42
 	create-chat
 		description: create a group with name <chatName> and invite <username> to this group
 		parameters: chatName, username
@@ -14,10 +28,21 @@ where <command> one of:
 		description: delete chat with <chatId>
 		parameters: chatId
 		example of use: .\TelegramNotifier.exe delete-chat 840666093
-	get-messages-from-chat
-		description: get messages from chat with <chatId> (without service messages)
-		parameters: chatId
-		example of use: .\TelegramNotifier.exe get-messages 840666093
+	list-chats
+		description: list all chats (groups, supergroups). Output: JSON array of { chat_id, title }. Use to find chat_id by name.
+		parameters: (none)
+		example: .\TelegramNotifier.exe list-chats
+	get-messages
+		description: get messages from chat (without service messages). Output: JSON array. Supports supergroups and optional topic filter.
+		parameters: chatId [, topicId]
+		example: .\TelegramNotifier.exe get-messages 840666093
+		example with topic: .\TelegramNotifier.exe get-messages -1001234567890 42
+		JSON fields per message: Id, Date (unix), FromUserId, Text, ReplyToMsgId, TopicId
+	create-topic
+		description: create a forum topic in a supergroup (forum must be enabled; requires manage_topics rights).
+		parameters: chatId, title
+		example: .\TelegramNotifier.exe create-topic -1001234567890 "New topic"
+		output: topic id (top_msg_id) for use with get-messages / send-message-to-chat
 	delete-user-from-chat
 		description: delete a user with <username> from chat with <chatId>
 		parameters: chatId username
